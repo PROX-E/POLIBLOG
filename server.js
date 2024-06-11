@@ -53,6 +53,52 @@ function isAuthenticated(req, res, next) {
     }
 };
 
+app.post('/add-post', isAuthenticated, (req, res) => {
+    const { title, content } = req.body;
+    const date = new Date().toISOString().split('T')[0];
+    db.run("INSERT INTO posts (title, content, date) VALUES (?, ?, ?)", [title, content, date], function(err) {
+        if (err) {
+            res.status(500).json({ success: false, message: err.message });
+            return;
+        }
+        res.json({ success: true });
+    });
+});
+
+app.post('/login', (req, res) => {
+    const { username, password } = req.body;
+    db.get("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
+        if (err) {
+            res.status(500).json({ success: false, message: err.message });
+            return;
+        }
+        if (row && await bcrypt.compare(password, row.password)) {
+            req.session.user = row;
+            res.json({ success: true });
+        } else {
+            res.json({ success: false, message: 'Invalid credentials' });
+        }
+    });
+});
+
+app.post('/logout', (req, res) => {
+    req.session.destroy((err) => {
+        if (err) {
+            res.status(500).json({ success: false, message: err.message });
+            return;
+        }
+        res.json({ success: true });
+    });
+});
+
+app.get('/check-login', (req, res) => {
+    if (req.session.user) {
+        res.json({ loggedIn: true });
+    } else {
+        res.json({ loggedIn: false });
+    }
+});
+
 app.listen(port, () => {
     console.log(`Server running at http://localhost:${port}`);
 });
