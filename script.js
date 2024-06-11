@@ -25,7 +25,7 @@ function loadPosts() {
         .then(data => {
             displayPosts(data.posts);
         });
-}
+};
 
 function displayPosts(posts) {
     const postsDiv = document.getElementById('posts');
@@ -36,7 +36,7 @@ function displayPosts(posts) {
         postDiv.innerHTML = `<h3>${post.title}</h3><p>${post.content}</p><p>${post.date}</p>`;
         postsDiv.appendChild(postDiv);
     });
-}
+};
 
 function checkLogin() {
     fetch('/check-login')
@@ -52,4 +52,18 @@ function checkLogin() {
                 document.getElementById('loginButton').style.display = 'block';
             }
         });
-}
+};
+
+document.getElementById('logoutButton').addEventListener('click', function() {
+    fetch('/logout', {
+        method: 'POST'
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            window.location.reload();
+        } else {
+            alert('Error logging out');
+        }
+    });
+});
