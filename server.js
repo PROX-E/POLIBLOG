@@ -26,3 +26,20 @@ app.use(session({
     resave: false,
     saveUninitialized: true,
 }));
+
+// Initialize the database with tables and admin user
+db.serialize(async () => {
+    db.run("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT, date TEXT)");
+    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)");
+
+    // Check if the admin user already exists
+    db.get("SELECT * FROM users WHERE username = ?", [process.env.ADMIN_USERNAME], async (err, row) => {
+        if (err) {
+            console.error(err.message);
+        } else if (!row) {
+            const saltRounds = 10;
+            const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
+            db.run("INSERT INTO users (username, password) VALUES (?, ?)", [process.env.ADMIN_USERNAME, hashedPassword]);
+        }
+    });
+});
