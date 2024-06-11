@@ -37,3 +37,19 @@ function displayPosts(posts) {
         postsDiv.appendChild(postDiv);
     });
 }
+
+function checkLogin() {
+    fetch('/check-login')
+        .then(response => response.json())
+        .then(data => {
+            if (data.loggedIn) {
+                document.getElementById('newPostSection').style.display = 'block';
+                document.getElementById('logoutButton').style.display = 'block';
+                document.getElementById('loginButton').style.display = 'none';
+            } else {
+                document.getElementById('newPostSection').style.display = 'none';
+                document.getElementById('logoutButton').style.display = 'none';
+                document.getElementById('loginButton').style.display = 'block';
+            }
+        });
+}
