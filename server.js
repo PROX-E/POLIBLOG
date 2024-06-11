@@ -53,6 +53,40 @@ function isAuthenticated(req, res, next) {
     }
 };
 
+app.get('/posts', (req, res) => {
+    db.all("SELECT * FROM posts", [], (err, rows) => {
+        if (err) {
+            res.status(500).json({ success: false, message: err.message });
+            return;
+        }
+        res.json({ success: true, posts: rows });
+    });
+});
+
+app.get('/search-posts', (req, res) => {
+    const { title, date } = req.query;
+    let query = "SELECT * FROM posts WHERE 1=1";
+    let params = [];
+
+    if (title) {
+        query += " AND title LIKE ?";
+        params.push(`%${title}%`);
+    }
+
+    if (date) {
+        query += " AND date = ?";
+        params.push(date);
+    }
+
+    db.all(query, params, (err, rows) => {
+        if (err) {
+            res.status(500).json({ success: false, message: err.message });
+            return;
+        }
+        res.json({ success: true, posts: rows });
+    });
+});
+
 app.post('/add-post', isAuthenticated, (req, res) => {
     const { title, content } = req.body;
     const date = new Date().toISOString().split('T')[0];
