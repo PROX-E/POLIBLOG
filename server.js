@@ -51,4 +51,8 @@ function isAuthenticated(req, res, next) {
     } else {
         res.status(401).json({ success: false, message: 'Unauthorized' });
     }
-}
+};
+
+app.listen(port, () => {
+    console.log(`Server running at http://localhost:${port}`);
+});
