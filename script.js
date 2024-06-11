@@ -19,3 +19,10 @@ document.getElementById('postForm').addEventListener('submit', function(e) {
         }
     });
 });
+function loadPosts() {
+    fetch('/posts')
+        .then(response => response.json())
+        .then(data => {
+            displayPosts(data.posts);
+        });
+}
