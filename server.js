@@ -43,3 +43,12 @@ db.serialize(async () => {
         }
     });
 });
+
+// Middleware to check if user is authenticated
+function isAuthenticated(req, res, next) {
+    if (req.session.user) {
+        return next();
+    } else {
+        res.status(401).json({ success: false, message: 'Unauthorized' });
+    }
+}
