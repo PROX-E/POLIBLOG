@@ -26,3 +26,14 @@ function loadPosts() {
             displayPosts(data.posts);
         });
 }
+
+function displayPosts(posts) {
+    const postsDiv = document.getElementById('posts');
+    postsDiv.innerHTML = '';
+    posts.forEach(post => {
+        const postDiv = document.createElement('div');
+        postDiv.className = 'post';
+        postDiv.innerHTML = `<h3>${post.title}</h3><p>${post.content}</p><p>${post.date}</p>`;
+        postsDiv.appendChild(postDiv);
+    });
+}
