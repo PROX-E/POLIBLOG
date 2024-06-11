@@ -67,3 +67,8 @@ document.getElementById('logoutButton').addEventListener('click', function() {
         }
     });
 });
+
+document.addEventListener('DOMContentLoaded', function() {
+    loadPosts();
+    checkLogin();
+});
