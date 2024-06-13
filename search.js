@@ -12,4 +12,19 @@ document.addEventListener('DOMContentLoaded', function() {
                 alert('Error searching posts');
             }
         });
+
+    function displaySearchResults(posts) {
+        const searchResultsDiv = document.getElementById('searchResults');
+        searchResultsDiv.innerHTML = '';
+        if (posts.length === 0) {
+            searchResultsDiv.innerHTML = '<p>No posts found</p>';
+            return;
+         }
+        posts.forEach(post => {
+             const postDiv = document.createElement('div');
+             postDiv.className = 'post';
+             postDiv.innerHTML = `<h3>${post.title}</h3><p>${post.content}</p><p>${post.date}</p>`;
+              searchResultsDiv.appendChild(postDiv);
+        });
+    }
 });
