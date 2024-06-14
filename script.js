@@ -20,13 +20,6 @@ document.getElementById('postForm').addEventListener('submit', function(e) {
     });
 });
 
-document.getElementById('searchForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const title = document.getElementById('searchTitle').value;
-    const date = document.getElementById('searchDate').value;
-    const queryParams = new URLSearchParams({ title, date }).toString();
-    window.location.href = `search-results.html?${queryParams}`;
-});
 
 function loadPosts() {
     fetch('/posts')
@@ -76,6 +69,15 @@ document.getElementById('logoutButton').addEventListener('click', function() {
         }
     });
 });
+
+document.getElementById('searchForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const title = document.getElementById('searchTitle').value;
+    const date = document.getElementById('searchDate').value;
+    const queryParams = new URLSearchParams({ title, date }).toString();
+    window.location.href = `search-results.html?${queryParams}`;
+});
+
 
 document.addEventListener('DOMContentLoaded', function() {
     loadPosts();
