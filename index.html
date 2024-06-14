@@ -13,21 +13,17 @@
             <a href="index.html" class="nav-button">Home</a>
             <a href="admin.html" id="loginButton" class="nav-button">Admin Login</a>
             <button id="logoutButton" class="nav-button" style="display: none;">Logout</button>
+            <form id="searchForm" class="search-form">
+                <input type="text" id="searchTitle" placeholder="Search by Title" class="search-input">
+                <input type="date" id="searchDate" class="search-input">
+                <button type="submit" class="search-button">Search</button>
+            </form>
         </nav>
     </header>
-    <div id="searchSection">
-        <h2>Search Posts</h2>
-        <form id="searchForm">
-            <input type="text" id="searchTitle" placeholder="Search by Title" class="search-input"><br>
-            <input type="date" id="searchDate" class="search-input"><br>
-            <button type="submit" class="search-button">Search</button>
-        </form>
-    </div>
     <div id="posts"></div>
     <div id="newPostSection" style="display: none;">
-        
+        <h2>Add a New Post</h2>
         <form id="postForm">
-            <h2>Add a New Post</h2>
             <input type="text" id="title" placeholder="Title" required><br>
             <textarea id="content" placeholder="Content" required></textarea><br>
             <button type="submit">Add Post</button>
