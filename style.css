@@ -75,3 +75,34 @@ h1 {
     font-size: 1em;
     margin-top: 10px;
 }
+
+.search-button:hover {
+    background-color: #ff3385;
+}
+
+#posts {
+    margin: 20px;
+}
+
+.post {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    margin-bottom: 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.post h3 {
+    color: #ff66a3;
+    margin-top: 0;
+}
+
+form {
+    background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
