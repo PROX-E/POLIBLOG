@@ -51,7 +51,7 @@ function isAuthenticated(req, res, next) {
     } else {
         res.status(401).json({ success: false, message: 'Unauthorized' });
     }
-};
+}
 
 app.get('/posts', (req, res) => {
     db.all("SELECT * FROM posts", [], (err, rows) => {
