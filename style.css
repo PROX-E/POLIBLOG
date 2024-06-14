@@ -131,3 +131,70 @@ button {
 button:hover {
     background-color: #ff3385;
 }
+
+/* Media Queries for Mobile Responsiveness */
+@media (max-width: 768px) {
+    header {
+        padding: 15px;
+    }
+
+    h1 {
+        font-size: 2em;
+    }
+
+    .taskbar {
+        flex-direction: column;
+    }
+
+    .nav-button {
+        margin: 10px 0;
+    }
+
+    #searchForm {
+        width: 100%;
+        padding: 0 10px;
+    }
+
+    .search-input {
+        width: 100%;
+        max-width: none;
+    }
+
+    form {
+        margin: 10px;
+        padding: 15px;
+    }
+}
+
+@media (max-width: 480px) {
+    header {
+        padding: 10px;
+    }
+
+    h1 {
+        font-size: 1.5em;
+    }
+
+    .nav-button {
+        font-size: 0.9em;
+    }
+
+    #searchSection {
+        margin: 10px;
+    }
+
+    .search-button {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+
+    form {
+        margin: 5px;
+        padding: 10px;
+    }
+
+    button {
+        padding: 8px 12px;
+        font-size: 0.9em;
+    }
+}
