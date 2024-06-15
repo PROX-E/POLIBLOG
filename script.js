@@ -35,7 +35,7 @@ function displayPosts(posts) {
     posts.forEach(post => {
         const postDiv = document.createElement('div');
         postDiv.className = 'post';
-        postDiv.innerHTML = `<h3>${post.title}</h3><p>${post.content}</p><p>${post.date}</p>`;
+        postDiv.innerHTML = `<h3>${post.title}</h3><p>${post.content}</p><p>${post.date}</p><button id="edit-button" style="display: none;">Edit</button> <button id="delete-post-button" style="display: none;>Delete</button>`;
         postsDiv.appendChild(postDiv);
     });
 };
@@ -48,10 +48,12 @@ function checkLogin() {
                 document.getElementById('newPostSection').style.display = 'block';
                 document.getElementById('logoutButton').style.display = 'block';
                 document.getElementById('loginButton').style.display = 'none';
+                document.getElementById('delete-post-button').style.display = 'block';
             } else {
                 document.getElementById('newPostSection').style.display = 'none';
                 document.getElementById('logoutButton').style.display = 'none';
                 document.getElementById('loginButton').style.display = 'block';
+                document.getElementById('delete-post-button').style.display = 'none';
             }
         });
 };
