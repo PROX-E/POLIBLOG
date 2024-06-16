@@ -99,6 +99,17 @@ app.post('/add-post', isAuthenticated, (req, res) => {
     });
 });
 
+app.delete('/delete-post/:id', isAuthenticated, (req, res) => {
+    const postId = req.params.id;
+    db.run("DELETE FROM posts WHERE id = ?", postId, function(err) {
+        if (err) {
+            res.status(500).json({ success: false, message: err.message });
+            return;
+        }
+        res.json({ success: true });
+    });
+});
+
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
     db.get("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
