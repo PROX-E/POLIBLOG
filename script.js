@@ -58,7 +58,7 @@ function displayPosts(posts) {
                 <h3>${post.title}</h3>
                 <p>${post.content}</p>
                 <small>${post.date}</small>
-                ${isAdmin ? `<button class="delete-button" data-id="${post.id}">Delete</button>` : ''}
+                ${isAdmin ? `<button class="delete-button" data-id="${post.id}"><img src="images/trash.png" alt="Delete" class="delete-button-icon"></button>` : ''}
             `;
             postsDiv.appendChild(postDiv);
         });
