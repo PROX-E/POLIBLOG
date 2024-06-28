@@ -29,6 +29,15 @@ h2 {
     margin-top: 1%;
 }
 
+footer {
+    flex-shrink: 0;
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    color: #333;
+    position:sticky;
+}
+
 .nav-button {
     color: #da9ce2;
     background-color: rgb(128, 126, 126);
@@ -74,32 +83,72 @@ h2 {
     background-color: #ff3385;
 }
 
-#posts {
-    margin: 20px;
-}
-
-.post {
+#newPostSection {
     background-color: #fff;
     border: 1px solid #ddd;
     padding: 20px;
-    margin-bottom: 10px;
     border-radius: 8px;
+    margin: 20px;
+    margin-right: 25%;
+    margin-left: 25%;
+    align-self: center;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    
+}
+
+#posts {
+    width: 60%;
+    margin: 20px auto;
+}
+
+.post {
+    background: url('images/parchment.jpg') no-repeat center center;
+    background-size: cover;
+    padding: 20px;
+    margin: 20px 0;
+    border: 1px solid #d3bfa3;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+    font-family: 'Cursive', serif;
+    color: #4b2e1e;
+    width: 100%;
+    align-self: center;
+    box-sizing: border-box;
 }
 
 .post h3 {
-    color: #ff66a3;
+    text-align: center;
     margin-top: 0;
 }
+.post p {
+    text-indent: 15%;
+    
+    margin-bottom: 20px;
+}
 
-form {
+.post small {
+    display: block;
+    text-align: center;
+    bottom: 10px;
+    width: 100%;
+    font-size: 12px;
+    color: #8a6d3b;
+}
+
+.login-form {
     background-color: #fff;
     border: 1px solid #ddd;
     padding: 20px;
     border-radius: 8px;
     margin: 20px;
     margin-right: 50%;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.search-form{
+background-color: #fff;
+    border: 1px solid #ddd;
+    padding: 20px;
+    border-radius: 8px;
+    margin: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
@@ -213,5 +262,26 @@ button:hover {
     .search-input {
         margin-right: 0;
         margin-bottom: 10px;
+    }
+}
+@media screen and (max-width: 768px) {
+    .taskbar {
+        flex-direction: column;
+    }
+
+    .nav-button {
+        margin: 5px 0;
+    }
+
+    #searchForm {
+        flex-direction: column;
+    }
+
+    .search-input {
+        margin: 5px 0;
+    }
+
+    #posts {
+        width: 90%;
     }
 }
