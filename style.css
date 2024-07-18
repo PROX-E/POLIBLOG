@@ -4,13 +4,16 @@ body {
     padding: 0;
     background-color: #f0f0f0;
     color: #333;
+    display: flex;
+    flex-direction: column;
+    min-height: 120vh;
 }
-
 header {
-    background-color: #ff99cc;
+    background-color: #7dc474;
     color: white;
     padding: 20px;
     text-align: center;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.295);
 }
 
 h1 {
@@ -20,38 +23,43 @@ h1 {
 
 .taskbar {
     display: flex;
-    justify-content: space-between;
     align-items: center;
-    background-color: #ff66a3;
+    background-color: #436539;
     padding: 10px;
     margin-top: 1%;
+    border-radius: 10px;
+    border: 1px solid #252424c2;
+    box-shadow: 0 4px 4px rgba(0, 0, 0, 0.468)
 }
+
 
 footer {
-    flex-shrink: 0;
-    text-align: center;
-    padding: 10px;
-    background-color: #f1f1f1;
-    color: #333;
+        flex-shrink: 0;
+        text-align: center;
+        padding: 10px;
+        background-color: #f1f1f1;
+        color: #333;
+        margin-top: auto;
 }
 
+
 .nav-button {
-    color: #da9ce2;
-    background-color: rgb(128, 126, 126);
     border: none;
     padding: 10px 20px;
     text-decoration: none;
     margin: 0 10px;
     cursor: pointer;
     border-radius: 4px;
+    background-color: #4e9931;
+    color: white;
+    cursor: pointer;
 }
 
 #title {
     width: 25%;
 }
 .nav-button:hover {
-    text-decoration: underline;
-    background-color: #ff99cc;
+    background-color: #4e9931a2;
 }
 
 #searchSection {
@@ -74,13 +82,13 @@ footer {
 .search-button {
     padding: 5px 10px;
     border: none;
-    background-color: pink;
+    background-color: #4e9931;
     color: white;
     cursor: pointer;
 }
 
 .search-button:hover {
-    background-color: #ff3385;
+    background-color: #4e9931a2;
 }
 
 #newPostSection {
@@ -101,17 +109,16 @@ footer {
 }
 
 .post {
-    background: url('images/parchment.jpg') no-repeat center center;
-    background-size: cover;
     padding: 20px;
     margin: 20px 0;
-    border: 1px solid #d3bfa3;
+    border: 2px solid #a0a753;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     font-family: 'Cursive', serif;
-    color: #4b2e1e;
+    color: #1f1916ce;
     width: 100%;
     align-self: center;
     box-sizing: border-box;
+    border-radius: 8px;
 }
 
 .post h3 {
@@ -130,14 +137,9 @@ footer {
     bottom: 10px;
     width: 100%;
     font-size: 12px;
-    color: #8a6d3b;
+    color: #1a2307;
 }
 
-.delete-button-icon {
-    width: 20px;
-    height: 20px;
-    margin-right: 8px;
-}
 
 .login-form {
     background-color: #fff;
@@ -152,10 +154,11 @@ footer {
 .search-form{
 background-color: #fff;
     border: 1px solid #ddd;
-    padding: 20px;
+    padding: 15px;
     border-radius: 8px;
     margin: 20px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    margin-left: auto;
 }
 
 input[type="text"],
@@ -171,7 +174,7 @@ textarea {
 }
 
 button {
-    background-color: #ff66a3;
+    background-color: #4e9931;
     color: white;
     padding: 10px 15px;
     border: none;
@@ -180,13 +183,9 @@ button {
     font-size: 1em;
 }
 
-.delete-button-icon {
-    width: 40px;
-    height: 40px;
-}
 
 button:hover {
-    background-color: #ff3385;
+    background-color: #4e9931a2;
 }
 
 /* Media Queries for Mobile Responsiveness */
