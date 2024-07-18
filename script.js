@@ -59,7 +59,9 @@ function displayPosts(posts) {
                 <p>${post.content}</p>
                 <small>${post.date}</small>
                 ${isAdmin ? `<button class="delete-button" data-id="${post.id}">Delete</button>` : ''}
-            `;
+                ${isAdmin ? `<button class="edit-button" data-id="${post.id}">Edit</button>` : ''
+                }
+                `;
             postsDiv.appendChild(postDiv);
         });
     });
@@ -108,6 +110,56 @@ document.getElementById('posts').addEventListener('click', (event) => {
         const postId = event.target.getAttribute('data-id');
         deletePost(postId);
     }
+});
+
+// Function to handle editing a post
+function editPost(postId) {
+    const postDiv = document.querySelector(`button[data-id="${postId}"]`).parentElement;
+    const title = postDiv.querySelector('h3').innerText;
+    const content = postDiv.querySelector('p').innerText;
+    
+    const editFormHtml = `
+        <form class="edit-post-form">
+            <input type="text" value="${title}" id="edit-title-${postId}" required><br>
+            <textarea id="edit-content-${postId}" required>${content}</textarea><br>
+            <button type="submit">Save</button>
+            <button type="button" onclick="cancelEdit(${postId})">Cancel</button>
+        </form>
+    `;
+    postDiv.innerHTML = editFormHtml;
+    
+    postDiv.querySelector('.edit-post-form').addEventListener('submit', function(e) {
+        e.preventDefault();
+        const newTitle = document.getElementById(`edit-title-${postId}`).value;
+        const newContent = document.getElementById(`edit-content-${postId}`).value;
+        
+        fetch(`/edit-post/${postId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({ title: newTitle, content: newContent })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                loadPosts(); // Refresh posts after editing
+            } else {
+                alert('Failed to edit post.');
+            }
+        });
+    });
+}
+
+// Function to cancel editing a post
+function cancelEdit(postId) {
+    loadPosts(); // Reload posts to revert changes
+}
+
+// Load posts and check login status when the DOM is loaded
+document.addEventListener('DOMContentLoaded', function() {
+    loadPosts();
+    checkLogin();
 });
 
 document.addEventListener('DOMContentLoaded', function() {

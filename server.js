@@ -52,17 +52,19 @@ function isAuthenticated(req, res, next) {
         res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 }
-
+// displaying posts
 app.get('/posts', (req, res) => {
-    db.all("SELECT * FROM posts ORDER BY date DESC", [], (err, rows) => {
-        if (err) {
-            res.status(500).json({ success: false, message: err.message });
-            return;
+    const query = 'SELECT * FROM posts ORDER BY date DESC'; // Ensure posts are ordered by date in descending order
+    connection.query(query, (error, results) => {
+        if (error) {
+            console.error('Error fetching posts:', error);
+            res.status(500).json({ success: false, error: 'Error fetching posts' });
+        } else {
+            res.json({ success: true, posts: results });
         }
-        res.json({ success: true, posts: rows });
     });
 });
-
+// searching posts
 app.get('/search-posts', (req, res) => {
     const { title, date } = req.query;
     let query = "SELECT * FROM posts WHERE 1=1";
@@ -86,7 +88,7 @@ app.get('/search-posts', (req, res) => {
         res.json({ success: true, posts: rows });
     });
 });
-
+// adding posts
 app.post('/add-post', isAuthenticated, (req, res) => {
     const { title, content } = req.body;
     const date = new Date().toISOString().split('T')[0];
@@ -98,7 +100,7 @@ app.post('/add-post', isAuthenticated, (req, res) => {
         res.json({ success: true });
     });
 });
-
+// deleting posts
 app.delete('/delete-post/:id', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     db.run("DELETE FROM posts WHERE id = ?", postId, function(err) {
@@ -107,6 +109,20 @@ app.delete('/delete-post/:id', isAuthenticated, (req, res) => {
             return;
         }
         res.json({ success: true });
+    });
+});
+// editing posts
+app.put('/edit-post/:id', (req, res) => {
+    const postId = req.params.id;
+    const { title, content } = req.body;
+    const query = 'UPDATE posts SET title = ?, content = ? WHERE id = ?';
+    connection.query(query, [title, content, postId], (error, results) => {
+        if (error) {
+            console.error('Error editing post:', error);
+            res.status(500).json({ success: false, error: 'Error editing post' });
+        } else {
+            res.json({ success: true });
+        }
     });
 });
 
