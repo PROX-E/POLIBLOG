@@ -54,7 +54,7 @@ function isAuthenticated(req, res, next) {
 }
 
 app.get('/posts', (req, res) => {
-    db.all("SELECT * FROM posts", [], (err, rows) => {
+    db.all("SELECT * FROM posts ORDER BY date DESC", [], (err, rows) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
             return;
