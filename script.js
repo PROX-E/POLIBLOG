@@ -1,4 +1,4 @@
-document.getElementById('postForm').addEventListener('submit', function(e) {
+document.getElementById('postForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
@@ -59,15 +59,14 @@ function displayPosts(posts) {
                 <p>${post.content}</p>
                 <small>${post.date}</small>
                 ${isAdmin ? `<button class="delete-button" data-id="${post.id}">Delete</button>` : ''}
-                ${isAdmin ? `<button class="edit-button" data-id="${post.id}">Edit</button>` : ''
-                }
-                `;
+                ${isAdmin ? `<button class="edit-button" data-id="${post.id}">Edit</button>` : ''}
+            `;
             postsDiv.appendChild(postDiv);
         });
     });
 }
 
-document.getElementById('logoutButton').addEventListener('click', function() {
+document.getElementById('logoutButton').addEventListener('click', function () {
     fetch('/logout', {
         method: 'POST'
     })
@@ -81,7 +80,7 @@ document.getElementById('logoutButton').addEventListener('click', function() {
     });
 });
 
-document.getElementById('searchForm').addEventListener('submit', function(e) {
+document.getElementById('searchForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const title = document.getElementById('searchTitle').value;
     const date = document.getElementById('searchDate').value;
@@ -109,6 +108,9 @@ document.getElementById('posts').addEventListener('click', (event) => {
     if (event.target.classList.contains('delete-button')) {
         const postId = event.target.getAttribute('data-id');
         deletePost(postId);
+    } else if (event.target.classList.contains('edit-button')) {
+        const postId = event.target.getAttribute('data-id');
+        editPost(postId);
     }
 });
 
@@ -117,7 +119,7 @@ function editPost(postId) {
     const postDiv = document.querySelector(`button[data-id="${postId}"]`).parentElement;
     const title = postDiv.querySelector('h3').innerText;
     const content = postDiv.querySelector('p').innerText;
-    
+
     const editFormHtml = `
         <form class="edit-post-form">
             <input type="text" value="${title}" id="edit-title-${postId}" required><br>
@@ -127,12 +129,12 @@ function editPost(postId) {
         </form>
     `;
     postDiv.innerHTML = editFormHtml;
-    
-    postDiv.querySelector('.edit-post-form').addEventListener('submit', function(e) {
+
+    postDiv.querySelector('.edit-post-form').addEventListener('submit', function (e) {
         e.preventDefault();
         const newTitle = document.getElementById(`edit-title-${postId}`).value;
         const newContent = document.getElementById(`edit-content-${postId}`).value;
-        
+
         fetch(`/edit-post/${postId}`, {
             method: 'PUT',
             headers: {
@@ -157,12 +159,7 @@ function cancelEdit(postId) {
 }
 
 // Load posts and check login status when the DOM is loaded
-document.addEventListener('DOMContentLoaded', function() {
-    loadPosts();
-    checkLogin();
-});
-
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
     loadPosts();
     checkLogin();
 });

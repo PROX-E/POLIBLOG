@@ -1,6 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
-const sqlite3 = require('sqlite3').verbose();
+const mysql = require('mysql');
 const session = require('express-session');
 const bcrypt = require('bcrypt');
 const dotenv = require('dotenv');
@@ -8,15 +8,59 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
-// Connect to the SQLite database file
-const db = new sqlite3.Database('./blog.db', (err) => {
-    if (err) {
-        console.error('Could not connect to database', err);
-    } else {
-        console.log('Connected to the SQLite database.');
-    }
+// Update with your Hostinger MySQL database details
+const connection = mysql.createConnection({
+    host: process.env.DB_HOST,  // e.g., 'mysql.hostinger.com'
+    user: process.env.DB_USER,
+    password: process.env.DB_PASS,
+    database: process.env.DB_NAME
+});
+
+connection.connect((err) => {
+    if (err) throw err;
+    console.log('Connected to the MySQL database.');
+
+    // Initialize the database with tables and admin user
+    const createPostsTable = `
+        CREATE TABLE IF NOT EXISTS posts (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            title VARCHAR(255),
+            content TEXT,
+            date DATE
+        )`;
+    const createUsersTable = `
+        CREATE TABLE IF NOT EXISTS users (
+            id INT AUTO_INCREMENT PRIMARY KEY,
+            username VARCHAR(255) UNIQUE,
+            password VARCHAR(255)
+        )`;
+
+    connection.query(createPostsTable, (err) => {
+        if (err) throw err;
+        console.log('Posts table created or already exists.');
+    });
+
+    connection.query(createUsersTable, (err) => {
+        if (err) throw err;
+        console.log('Users table created or already exists.');
+
+        // Check if the admin user already exists
+        const checkAdminUser = "SELECT * FROM users WHERE username = ?";
+        connection.query(checkAdminUser, [process.env.ADMIN_USERNAME], async (err, results) => {
+            if (err) throw err;
+            if (results.length === 0) {
+                const saltRounds = 10;
+                const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
+                const insertAdminUser = "INSERT INTO users (username, password) VALUES (?, ?)";
+                connection.query(insertAdminUser, [process.env.ADMIN_USERNAME, hashedPassword], (err) => {
+                    if (err) throw err;
+                    console.log('Admin user created.');
+                });
+            }
+        });
+    });
 });
 
 app.use(bodyParser.json());
@@ -27,23 +71,6 @@ app.use(session({
     saveUninitialized: true,
 }));
 
-// Initialize the database with tables and admin user
-db.serialize(async () => {
-    db.run("CREATE TABLE IF NOT EXISTS posts (id INTEGER PRIMARY KEY, title TEXT, content TEXT, date TEXT)");
-    db.run("CREATE TABLE IF NOT EXISTS users (id INTEGER PRIMARY KEY, username TEXT, password TEXT)");
-
-    // Check if the admin user already exists
-    db.get("SELECT * FROM users WHERE username = ?", [process.env.ADMIN_USERNAME], async (err, row) => {
-        if (err) {
-            console.error(err.message);
-        } else if (!row) {
-            const saltRounds = 10;
-            const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
-            db.run("INSERT INTO users (username, password) VALUES (?, ?)", [process.env.ADMIN_USERNAME, hashedPassword]);
-        }
-    });
-});
-
 // Middleware to check if user is authenticated
 function isAuthenticated(req, res, next) {
     if (req.session.user) {
@@ -52,9 +79,10 @@ function isAuthenticated(req, res, next) {
         res.status(401).json({ success: false, message: 'Unauthorized' });
     }
 }
-// displaying posts
+
+// Displaying posts
 app.get('/posts', (req, res) => {
-    const query = 'SELECT * FROM posts ORDER BY date DESC'; // Ensure posts are ordered by date in descending order
+    const query = 'SELECT * FROM posts ORDER BY date DESC';
     connection.query(query, (error, results) => {
         if (error) {
             console.error('Error fetching posts:', error);
@@ -64,7 +92,8 @@ app.get('/posts', (req, res) => {
         }
     });
 });
-// searching posts
+
+// Searching posts
 app.get('/search-posts', (req, res) => {
     const { title, date } = req.query;
     let query = "SELECT * FROM posts WHERE 1=1";
@@ -80,19 +109,21 @@ app.get('/search-posts', (req, res) => {
         params.push(date);
     }
 
-    db.all(query, params, (err, rows) => {
+    connection.query(query, params, (err, results) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
             return;
         }
-        res.json({ success: true, posts: rows });
+        res.json({ success: true, posts: results });
     });
 });
-// adding posts
+
+// Adding posts
 app.post('/add-post', isAuthenticated, (req, res) => {
     const { title, content } = req.body;
     const date = new Date().toISOString().split('T')[0];
-    db.run("INSERT INTO posts (title, content, date) VALUES (?, ?, ?)", [title, content, date], function(err) {
+    const query = "INSERT INTO posts (title, content, date) VALUES (?, ?, ?)";
+    connection.query(query, [title, content, date], (err) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
             return;
@@ -100,10 +131,12 @@ app.post('/add-post', isAuthenticated, (req, res) => {
         res.json({ success: true });
     });
 });
-// deleting posts
+
+// Deleting posts
 app.delete('/delete-post/:id', isAuthenticated, (req, res) => {
     const postId = req.params.id;
-    db.run("DELETE FROM posts WHERE id = ?", postId, function(err) {
+    const query = "DELETE FROM posts WHERE id = ?";
+    connection.query(query, [postId], (err) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
             return;
@@ -111,8 +144,9 @@ app.delete('/delete-post/:id', isAuthenticated, (req, res) => {
         res.json({ success: true });
     });
 });
-// editing posts
-app.put('/edit-post/:id', (req, res) => {
+
+// Editing posts
+app.put('/edit-post/:id', isAuthenticated, (req, res) => {
     const postId = req.params.id;
     const { title, content } = req.body;
     const query = 'UPDATE posts SET title = ?, content = ? WHERE id = ?';
@@ -128,13 +162,14 @@ app.put('/edit-post/:id', (req, res) => {
 
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    db.get("SELECT * FROM users WHERE username = ?", [username], async (err, row) => {
+    const query = "SELECT * FROM users WHERE username = ?";
+    connection.query(query, [username], async (err, results) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
             return;
         }
-        if (row && await bcrypt.compare(password, row.password)) {
-            req.session.user = row;
+        if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
+            req.session.user = results[0];
             res.json({ success: true });
         } else {
             res.json({ success: false, message: 'Invalid credentials' });
