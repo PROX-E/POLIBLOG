@@ -1,9 +1,11 @@
+const BASE_URL = 'https://solorgenergy.com'; // Update to your server's URL
+
 document.getElementById('postForm').addEventListener('submit', function (e) {
     e.preventDefault();
     const title = document.getElementById('title').value;
     const content = document.getElementById('content').value;
 
-    fetch('/add-post', {
+    fetch(`${BASE_URL}/add-post`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
@@ -21,7 +23,7 @@ document.getElementById('postForm').addEventListener('submit', function (e) {
 });
 
 function loadPosts() {
-    fetch('/posts')
+    fetch(`${BASE_URL}/posts`)
         .then(response => response.json())
         .then(data => {
             displayPosts(data.posts);
@@ -29,7 +31,7 @@ function loadPosts() {
 }
 
 function checkLogin() {
-    return fetch('/check-login')
+    return fetch(`${BASE_URL}/public_html/check-login`)
         .then(response => response.json())
         .then(data => {
             if (data.loggedIn) {
@@ -67,7 +69,7 @@ function displayPosts(posts) {
 }
 
 document.getElementById('logoutButton').addEventListener('click', function () {
-    fetch('/logout', {
+    fetch(`${BASE_URL}/logout`, {
         method: 'POST'
     })
     .then(response => response.json())
@@ -90,7 +92,7 @@ document.getElementById('searchForm').addEventListener('submit', function (e) {
 
 // Function to handle delete post
 function deletePost(postId) {
-    fetch(`/delete-post/${postId}`, {
+    fetch(`${BASE_URL}/delete-post/${postId}`, {
         method: 'DELETE'
     })
     .then(response => response.json())
@@ -135,7 +137,7 @@ function editPost(postId) {
         const newTitle = document.getElementById(`edit-title-${postId}`).value;
         const newContent = document.getElementById(`edit-content-${postId}`).value;
 
-        fetch(`/edit-post/${postId}`, {
+        fetch(`${BASE_URL}/edit-post/${postId}`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json'

@@ -10,7 +10,6 @@ dotenv.config();
 const app = express();
 const port = process.env.PORT || 3000;
 
-// Update with your Hostinger MySQL database details
 const connection = mysql.createConnection({
     host: process.env.DB_HOST,  // e.g., 'mysql.hostinger.com'
     user: process.env.DB_USER,
@@ -19,44 +18,44 @@ const connection = mysql.createConnection({
 });
 
 connection.connect((err) => {
-    if (err) throw err;
+    if (err) {
+        console.error('Error connecting to the database:', err);
+        return;
+    }
     console.log('Connected to the MySQL database.');
 
-    // Initialize the database with tables and admin user
-    const createPostsTable = `
+    connection.query(`
         CREATE TABLE IF NOT EXISTS posts (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            title VARCHAR(255),
-            content TEXT,
-            date DATE
-        )`;
-    const createUsersTable = `
+            title VARCHAR(255) NOT NULL,
+            content TEXT NOT NULL,
+            date DATE NOT NULL
+        );
+        
         CREATE TABLE IF NOT EXISTS users (
             id INT AUTO_INCREMENT PRIMARY KEY,
-            username VARCHAR(255) UNIQUE,
-            password VARCHAR(255)
-        )`;
+            username VARCHAR(255) NOT NULL,
+            password VARCHAR(255) NOT NULL
+        );
+    `, (err) => {
+        if (err) {
+            console.error('Error creating tables:', err);
+            return;
+        }
+        console.log('Tables created or verified.');
 
-    connection.query(createPostsTable, (err) => {
-        if (err) throw err;
-        console.log('Posts table created or already exists.');
-    });
-
-    connection.query(createUsersTable, (err) => {
-        if (err) throw err;
-        console.log('Users table created or already exists.');
-
-        // Check if the admin user already exists
-        const checkAdminUser = "SELECT * FROM users WHERE username = ?";
-        connection.query(checkAdminUser, [process.env.ADMIN_USERNAME], async (err, results) => {
-            if (err) throw err;
-            if (results.length === 0) {
+        connection.query("SELECT * FROM users WHERE username = ?", [process.env.ADMIN_USERNAME], async (err, results) => {
+            if (err) {
+                console.error('Error querying admin user:', err);
+            } else if (results.length === 0) {
                 const saltRounds = 10;
                 const hashedPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD, saltRounds);
-                const insertAdminUser = "INSERT INTO users (username, password) VALUES (?, ?)";
-                connection.query(insertAdminUser, [process.env.ADMIN_USERNAME, hashedPassword], (err) => {
-                    if (err) throw err;
-                    console.log('Admin user created.');
+                connection.query("INSERT INTO users (username, password) VALUES (?, ?)", [process.env.ADMIN_USERNAME, hashedPassword], (err) => {
+                    if (err) {
+                        console.error('Error inserting admin user:', err);
+                    } else {
+                        console.log('Admin user created.');
+                    }
                 });
             }
         });
@@ -64,7 +63,7 @@ connection.connect((err) => {
 });
 
 app.use(bodyParser.json());
-app.use(express.static(__dirname));
+app.use(express.static('public_html')); // Serve static files from public_html
 app.use(session({
     secret: process.env.SECRET_KEY,
     resave: false,
@@ -97,7 +96,7 @@ app.get('/posts', (req, res) => {
 app.get('/search-posts', (req, res) => {
     const { title, date } = req.query;
     let query = "SELECT * FROM posts WHERE 1=1";
-    let params = [];
+    const params = [];
 
     if (title) {
         query += " AND title LIKE ?";
@@ -112,9 +111,9 @@ app.get('/search-posts', (req, res) => {
     connection.query(query, params, (err, results) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
-            return;
+        } else {
+            res.json({ success: true, posts: results });
         }
-        res.json({ success: true, posts: results });
     });
 });
 
@@ -122,26 +121,24 @@ app.get('/search-posts', (req, res) => {
 app.post('/add-post', isAuthenticated, (req, res) => {
     const { title, content } = req.body;
     const date = new Date().toISOString().split('T')[0];
-    const query = "INSERT INTO posts (title, content, date) VALUES (?, ?, ?)";
-    connection.query(query, [title, content, date], (err) => {
+    connection.query("INSERT INTO posts (title, content, date) VALUES (?, ?, ?)", [title, content, date], (err) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
-            return;
+        } else {
+            res.json({ success: true });
         }
-        res.json({ success: true });
     });
 });
 
 // Deleting posts
 app.delete('/delete-post/:id', isAuthenticated, (req, res) => {
     const postId = req.params.id;
-    const query = "DELETE FROM posts WHERE id = ?";
-    connection.query(query, [postId], (err) => {
+    connection.query("DELETE FROM posts WHERE id = ?", [postId], (err) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
-            return;
+        } else {
+            res.json({ success: true });
         }
-        res.json({ success: true });
     });
 });
 
@@ -160,15 +157,13 @@ app.put('/edit-post/:id', isAuthenticated, (req, res) => {
     });
 });
 
+// Login
 app.post('/login', (req, res) => {
     const { username, password } = req.body;
-    const query = "SELECT * FROM users WHERE username = ?";
-    connection.query(query, [username], async (err, results) => {
+    connection.query("SELECT * FROM users WHERE username = ?", [username], async (err, results) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
-            return;
-        }
-        if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
+        } else if (results.length > 0 && await bcrypt.compare(password, results[0].password)) {
             req.session.user = results[0];
             res.json({ success: true });
         } else {
@@ -177,22 +172,29 @@ app.post('/login', (req, res) => {
     });
 });
 
+// Logout
 app.post('/logout', (req, res) => {
     req.session.destroy((err) => {
         if (err) {
             res.status(500).json({ success: false, message: err.message });
-            return;
+        } else {
+            res.json({ success: true });
         }
-        res.json({ success: true });
     });
 });
 
+// Check login status
 app.get('/check-login', (req, res) => {
     if (req.session.user) {
         res.json({ loggedIn: true });
     } else {
         res.json({ loggedIn: false });
     }
+});
+
+// Catch-all route to handle 404 errors
+app.use((req, res) => {
+    res.status(404).json({ success: false, message: 'Route not found' });
 });
 
 app.listen(port, () => {
