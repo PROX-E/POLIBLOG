@@ -31,7 +31,7 @@ function loadPosts() {
 }
 
 function checkLogin() {
-    return fetch(`${BASE_URL}/public_html/check-login`)
+    return fetch(`${BASE_URL}/check-login`)
         .then(response => response.json())
         .then(data => {
             if (data.loggedIn) {
